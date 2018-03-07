@@ -22,7 +22,7 @@ namespace WebCrawler
             for(int i = 1; i <= page; i++)
             {
                 StringBuilder address = new StringBuilder(url);
-                address.Append();
+                address.Append(@"");
                 address.Append(i.ToString());
   
                 HtmlWeb web = new HtmlWeb();
@@ -38,26 +38,10 @@ namespace WebCrawler
                         var article = new Article();
                         foreach (var element in node.Descendants("td"))
                         {
-                            string value = element.Attributes["class"].Value;
+                            string classValue = element.Attributes["class"].Value;
                             string txt = element.InnerText.Trim();
-                            switch (value)
-                            {
-                                case "title":
-                                    int idx = txt.IndexOf("\n");
-                                    string titleTxt = txt.Substring(0, idx);
-                                    string linkUrl = element.Element("a").Attributes["href"].Value;
-                                    article.Title = titleTxt;
-                                    article.Link = linkUrl;
-                                    break;
-                                case "recommend":
-                                    article.Liked = txt;
-                                    break;
-                                case "author":
-                                    article.Author = txt;
-                                    break;
-                                default:
-                                    break;
-                            }
+                            AssignValuesToArticle(element, article, txt, classValue);
+                           
                         }
                         AddArticle(article);
                     }
@@ -75,6 +59,28 @@ namespace WebCrawler
             if (article.Title != null)
             {
                 _articles.Add(article);
+            }
+        }
+
+        private void AssignValuesToArticle(HtmlNode element, Article article, string txt, string classValue)
+        {
+            switch (classValue)
+            {
+                case "title":
+                    int idx = txt.IndexOf("\n");
+                    string titleTxt = txt.Substring(0, idx);
+                    string linkUrl = element.Element("a").Attributes["href"].Value;
+                    article.Title = titleTxt;
+                    article.Link = linkUrl;
+                    break;
+                case "recommend":
+                    article.Liked = txt;
+                    break;
+                case "author":
+                    article.Author = txt;
+                    break;
+                default:
+                    break;
             }
         }
 
