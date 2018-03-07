@@ -17,38 +17,75 @@ namespace WebCrawler
             _articles = new List<Article>();
         }
 
-        public void Crawl(string url, string selector)
+        public void Crawl(string url, string selector, int page)
         {
-            HtmlWeb web = new HtmlWeb();
-            var htmlDoc = web.Load(url);
-  
-            var nodes = htmlDoc.DocumentNode
-                            .SelectNodes(selector);
-
-            foreach(var node in nodes)
+            for(int i = 1; i <= page; i++)
             {
-                try
-                {
-                    string value = node.Attributes["class"].Value;
+                StringBuilder address = new StringBuilder(url);
+                address.Append(@"/index.php?mid=ilbe&page=");
+                address.Append(i.ToString());
+  
+                HtmlWeb web = new HtmlWeb();
+                var htmlDoc = web.Load(address.ToString());
 
-                    if (value.Equals("title"))
+                var nodes = htmlDoc.DocumentNode
+                                .SelectNodes(selector);
+
+                foreach (var node in nodes)
+                {
+                    try
                     {
-                        Console.WriteLine($"Title: {node.InnerText.Trim()}");
-                    }else if (value.Equals("recommend"))
-                    {
-                        Console.WriteLine($"Liked: {node.InnerText.Trim()}");
+                        var article = new Article();
+                        foreach (var element in node.Descendants("td"))
+                        {
+
+
+                            string value = element.Attributes["class"].Value;
+                            string txt = element.InnerText.Trim();
+                            switch (value)
+                            {
+                                case "title":
+                                    int idx = txt.IndexOf("\n");
+                                    string titleTxt = txt.Substring(0, idx);
+                                    string linkUrl = element.Element("a").Attributes["href"].Value;
+                                    article.Title = titleTxt;
+                                    article.Link = linkUrl;
+                                    break;
+                                case "recommend":
+                                    article.Liked = txt;
+                                    break;
+                                case "author":
+                                    article.Author = txt;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        if (article.Title != null)
+                        {
+                            _articles.Add(article);
+                        }
+
                     }
-                    else if (value.Equals("author"))
+                    catch (NullReferenceException ex)
                     {
-                        Console.WriteLine($"Author: {node.InnerText.Trim()}");
+                        continue;
                     }
                 }
-                catch (NullReferenceException ex)
-                {
-                    Console.WriteLine("pass");
-                }  
+            }
+            
+        }
+
+        public void PrintArticles()
+        {
+            foreach (var article in _articles)
+            {
+                Console.WriteLine($"Title: {article.Title}");
+                Console.WriteLine($"URL: {article.Link}");
+                Console.WriteLine($"Author: {article.Author}");
+                Console.WriteLine($"Liked: {article.Liked}");
+                Console.WriteLine("");
             }
         }
-       
     }
 }

@@ -12,7 +12,8 @@ namespace WebCrawler
         static void Main(string[] args)
         {
             Crawler crawler = new Crawler();
-            crawler.Crawl();
+            crawler.Crawl(@"", "//tr", 2);
+            crawler.PrintArticles();
             Console.ReadLine();
         }
     }
