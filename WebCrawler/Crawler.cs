@@ -38,8 +38,6 @@ namespace WebCrawler
                         var article = new Article();
                         foreach (var element in node.Descendants("td"))
                         {
-
-
                             string value = element.Attributes["class"].Value;
                             string txt = element.InnerText.Trim();
                             switch (value)
@@ -61,11 +59,7 @@ namespace WebCrawler
                                     break;
                             }
                         }
-                        if (article.Title != null)
-                        {
-                            _articles.Add(article);
-                        }
-
+                        AddArticle(article);
                     }
                     catch (NullReferenceException ex)
                     {
@@ -74,6 +68,14 @@ namespace WebCrawler
                 }
             }
             
+        }
+
+        private void AddArticle(Article article)
+        {
+            if (article.Title != null)
+            {
+                _articles.Add(article);
+            }
         }
 
         public void PrintArticles()
