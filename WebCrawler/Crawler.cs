@@ -22,7 +22,7 @@ namespace WebCrawler
             for(int i = 1; i <= page; i++)
             {
                 StringBuilder address = new StringBuilder(url);
-                address.Append(@"/index.php?mid=ilbe&page=");
+                address.Append();
                 address.Append(i.ToString());
   
                 HtmlWeb web = new HtmlWeb();
